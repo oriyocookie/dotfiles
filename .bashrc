@@ -125,3 +125,5 @@ export PATH
 LS_COLORS=$LS_COLORS:'di=0;31:ex=1;31' ; export LS_COLORS
 #export PS1="\u@\h:\W\\$ \[$(tput sgr0)\]"
 export  PS1='${debian_chroot:+($debian_chroot)}\[\033[00;35m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+
+neofetch
