@@ -1,0 +1,458 @@
+* Introduction
+Witchmacs is a very simple and basic configuration file for Emacs. From here you can edit, remove,
+or add many aspects of Emacs you want. I encourage you to do so, because Emacs works best when it's
+customized to your own liking!
+* QoL section
+** Enable line numbers
+#+BEGIN_SRC emacs-lisp
+  (global-linum-mode 1)
+#+END_SRC
+** Enable parenthesis matching
+#+BEGIN_SRC emacs-lisp
+  (show-paren-mode 1)
+#+END_SRC
+** Disable the default startup screen
+#+BEGIN_SRC emacs-lisp
+  (setq inhibit-startup-message t)
+#+END_SRC
+** Disable most gui elements
+#+BEGIN_SRC emacs-lisp
+  (tool-bar-mode -1)
+  (menu-bar-mode)
+  (scroll-bar-mode -1)
+#+END_SRC
+** Enable copypasting outside of Emacs
+#+BEGIN_SRC emacs-lisp
+  (setq x-select-enable-clipboard t)
+#+END_SRC
+** Disable automatic creation of backup files
+#+BEGIN_SRC emacs-lisp
+  (setq make-backup-files nil)
+  (setq auto-save-default nil)
+#+END_SRC
+** Enable conservative scrolling
+#+BEGIN_SRC emacs-lisp
+  (setq scroll-conservatively 100)
+#+END_SRC
+** Disable ring-bell
+#+BEGIN_SRC emacs-lisp
+  (setq ring-bell-function 'ignore)
+#+END_SRC
+** Set standard indent and tab size to 4
+#+BEGIN_SRC emacs-lisp
+  (setq-default standard-indent 4)
+  (setq-default tab-width 4)
+  (setq c-basic-offset tab-width)
+#+END_SRC
+** Enable prettify symbols mode
+#+BEGIN_SRC emacs-lisp
+  (global-prettify-symbols-mode )
+#+END_SRC
+** Enable bracket pair-matching
+#+BEGIN_SRC emacs-lisp
+  (setq electric-pair-pairs '(
+							 (?\{ . ?\})
+							 (?\( . ?\))
+							 (?\[ . ?\])
+							 (?\" . ?\")
+							))
+  (electric-pair-mode t)
+#+END_SRC
+** Creating a new window switches your cursor to it
+#+BEGIN_SRC emacs-lisp
+  (defun split-and-follow-horizontally ()
+	(interactive)
+	(split-window-below)
+	(balance-windows)
+	(other-window 1))
+  (global-set-key (kbd "C-x 2") 'split-and-follow-horizontally)
+
+  (defun split-and-follow-vertically ()
+	(interactive)
+	(split-window-right)
+	(balance-windows)
+	(other-window 1))
+  (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
+#+END_SRC
+* Use-package section
+** Initialize diminish
+*** Description
+Diminish hides minor modes in the modeline to prevent
+cluttering it.
+*** Code
+#+BEGIN_SRC emacs-lisp
+  (use-package diminish
+	:ensure t
+	:after (:all 
+	beacon
+	which-key
+	page-break-lines
+	undo-tree
+	eldoc
+	abbrev
+	irony
+	company)
+	:config
+	(diminish 'beacon-mode)
+	(diminish 'which-key-mode)
+	(diminish 'page-break-lines-mode)
+	(diminish 'undo-tree-mode)
+	(diminish 'eldoc-mode)
+	(diminish 'abbrev-mode)
+	(diminish 'irony-mode)
+	(diminish 'company-mode))
+#+END_SRC
+*** Historical
+This macro was provided by user [[https://gist.github.com/ld34/44d100b79964407e5ddf41035e3cd32f][ld43]] on 22-04-2019 after
+I couldn't figure out how to make diminish work by being
+at the top of the config file
+#+BEGIN_SRC emacs-lisp
+;(defmacro diminish-built-in (&rest modes)
+;  "Accepts a list MODES of built-in emacs modes and generates `with-eval-after-load` diminish forms based on the file implementing the mode functionality for each mode."
+;  (declare (indent defun))
+;  (let* ((get-file-names (lambda (pkg) (file-name-base (symbol-file pkg))))
+;	 (diminish-files (mapcar get-file-names modes))
+;	 (zip-diminish   (-zip modes diminish-files)))
+;    `(progn
+;       ,@(cl-loop for (mode . file) in zip-diminish
+;		  collect `(with-eval-after-load ,file
+;			     (diminish (quote ,mode)))))))
+; This bit goes in init.el
+;(diminish-built-in
+;  beacon-mode
+;  which-key-mode
+;  page-break-lines-mode
+;  undo-tree-mode
+;  eldoc-mode
+;  abbrev-mode
+;  irony-mode
+;  company-mode)
+#+END_SRC
+** Initialize spaceline
+*** Description
+I tried spaceline and didn't like it. What I did like
+was its theme
+*** Code
+#+BEGIN_SRC emacs-lisp
+  (use-package spaceline
+	:ensure t)
+#+END_SRC
+** Initialize powerline and utilize the spaceline theme
+*** Description
+I prefer powerline over spaceline, but the default powerline
+themes don't work for me for whatever reason, so I use the
+spaceline theme
+*** Code
+#+BEGIN_SRC emacs-lisp
+  (use-package powerline
+	:ensure t
+	:init
+	(spaceline-spacemacs-theme)
+	:hook
+	('after-init-hook) . 'powerline-reset)
+#+END_SRC
+** Initialize dashboard
+*** Description
+The frontend of Witchmacs; without this there'd be no Marisa
+in your Emacs startup screen
+*** Code
+#+BEGIN_SRC emacs-lisp
+  (use-package dashboard
+	:ensure t
+	:preface
+	(defun update-config ()
+	  "Update Witchmacs to the latest version."
+	  (interactive)
+	  (let ((dir (expand-file-name user-emacs-directory)))
+		(if (file-exists-p dir)
+			(progn
+			  (message "Witchmacs is updating!")
+			  (cd dir)
+			  (shell-command "git pull")
+			  (message "Update finished. Switch to the messages buffer to see changes and then restart Emacs"))
+		  (message "\"%s\" doesn't exist." dir))))
+
+	(defun create-scratch-buffer ()
+	  "Create a scratch buffer"
+	  (interactive)
+	  (switch-to-buffer (get-buffer-create "*scratch*"))
+	  (lisp-interaction-mode))
+
+	(defun dashboard-center-line (&optional real-width)
+		"Center-align when point is at the end of a line"
+		(let* ((width (or real-width (current-column)))
+			   (margin (max 0 (floor (/ (- dashboard-banner-length width) 2)))))
+		  (beginning-of-line)
+		  (insert (make-string margin ?\s))
+		  (end-of-line)))
+
+	(defun dashboard-insert-buttons()
+	  "Insert custom buttons after banner"
+	  (interactive)
+	  (with-current-buffer (get-buffer dashboard-buffer-name)
+		(read-only-mode -1)
+		(goto-char (point-min))
+		(search-forward dashboard-banner-logo-title nil t)
+
+		(insert "\n\n\n")
+		(widget-create 'url-link
+					   :tag "Witchmacs on github"
+					   :help-echo "Open Witchmacs' github page on your browser"
+					   :mouse-face 'highlight
+					   "https://github.com/snackon/witchmacs")
+
+		(insert " ")
+		(widget-create 'file-link
+					   :tag "Witchmacs Cheatsheet"
+					   :help-echo "Open Witchmacs cheatsheet"
+					   :mouse-face 'highlight
+					   "~/.emacs.d/Witcheat.org")
+
+		(insert " ")
+		(widget-create 'push-button
+				   :tag "Update Witchmacs"
+				   :help-echo "Get the latest Witchmacs update. Check out the github commits for changes!"
+				   :mouse-face 'highlight
+				   :action (lambda (&rest _) (update-config)))
+
+		(dashboard-center-line)
+		(insert "\n")
+
+		(insert " ")
+		(widget-create 'push-button
+					   :tag "Open scratch buffer"
+					   :help-echo "Switch to the scratch buffer"
+					   :mouse-face 'highlight
+					   :action (lambda (&rest _) (create-scratch-buffer)))
+		(insert " ")
+		(widget-create 'file-link
+					   :tag "Open config.org"
+					   :help-echo "Open Witchmacs' configuration file for easy editing"
+					   :mouse-face 'highlight
+					   "~/.emacs.d/config.org")
+
+		(dashboard-center-line)
+		(insert "\n\n")
+
+		(insert (concat
+				 (propertize (format "%d packages loaded in %s"
+						(length package-activated-list) (emacs-init-time))
+				'face 'font-lock-comment-face)))
+
+		(dashboard-center-line)
+		(read-only-mode 1)))
+	:config
+	(dashboard-setup-startup-hook)
+	(setq dashboard-items '((recents . 5)))
+	(setq dashboard-banner-logo-title "L O L I M A C S - The cutest fork of Witchmacs!")
+	(setq dashboard-startup-banner "~/.emacs.d/marivector.png")
+	(setq dashboard-center-content t)
+	(setq dashboard-show-shortcuts nil))
+	(add-hook 'dashboard-mode-hook #'dashboard-insert-buttons)
+#+END_SRC
+*** Notes
+If you pay close attention to the code in dashboard, you'll 
+notice that it uses custom functions defined under the :preface
+use-package block. I wrote all of those functions by looking
+at other people's Emacs distributions (Mainly [[https://github.com/seagle0128/.emacs.d][Centaur Emacs]])
+and then experimenting and adapting them to Witchmacs. If you
+dig around, you'll find the same things I did - maybe even more!
+** Initialize which-key
+*** Description
+Incredibly useful package; press tab to see possible command
+completions
+*** Code
+#+BEGIN_SRC emacs-lisp
+  (use-package which-key
+	:ensure t
+	:init
+	(which-key-mode))
+#+END_SRC
+** Initialize swiper
+*** Description
+When doing C-s to search, you get this very nice and neat
+mini-buffer that you can traverse with the arrow keys (or
+C-n and C-p) and then press <RET> to select where you want
+to go
+*** Code
+#+BEGIN_SRC emacs-lisp
+  (use-package swiper
+	:ensure t
+	:bind ("C-s" . 'swiper))
+#+END_SRC
+** Initialize evil mode
+*** Description
+Vim keybindings in Emacs. Please note that Witchmacs has NO
+other evil-mode compatibility packages because I like to
+KISS. This might change in the future
+*** Code
+#+BEGIN_SRC emacs-lisp
+  (use-package evil
+	:ensure t
+	:init
+	(evil-mode 1))
+#+END_SRC
+** Initialize beacon
+*** Description
+You might find beacon an unnecesary package but I find it very
+neat. It briefly highlights the cursor position when switching
+to a new window or buffer
+*** Code
+#+BEGIN_SRC emacs-lisp
+  (use-package beacon
+	:ensure t
+	:init
+	(beacon-mode 1))
+#+END_SRC
+** Initialize avy
+*** Description
+Avy is a very useful package; instead of having to move your 
+cursor to a line that is very far away, just do M - s and 
+type the character that you want to move to
+*** Code
+#+BEGIN_SRC emacs-lisp
+  (use-package avy
+	:ensure t
+	:bind
+	("M-s" . avy-goto-char))
+#+END_SRC
+** Initialize switch-window
+*** Description
+Switch window is a neat package because instead of having to
+painstakingly do C - x o until you're in the window you want 
+to edit, you can just do C - x o and pick the one you want to
+move to according to the letter it is assigned to
+*** Code
+#+BEGIN_SRC emacs-lisp
+  (use-package switch-window
+	:ensure t
+	:defer t
+	:config
+	(setq switch-window-input-style 'minibuffer)
+	(setq switch-window-increase 4)
+	(setq switch-window-threshold 2)
+	(setq switch-window-shortcut-style 'qwerty)
+	(setq switch-window-qwerty-shortcuts
+		  '("a" "s" "d" "f" "j" "k" "l"))
+	:bind
+	([remap other-window] . switch-window))
+#+END_SRC
+** Initialize ido and ido-vertical
+*** Description
+For the longest time I used the default way of switching and
+killing buffers in Emacs. Same for finding files. Ido-mode
+made these three tasks IMMENSELY easier and more intuitive.
+Please not that I still use the default way M - x works because
+I believe all you really need for it is which-key
+*** Code
+#+BEGIN_SRC emacs-lisp
+  (setq ido-enable-flex-matching nil)
+  (setq ido-create-new-buffer 'always)
+  (setq ido-everywhere t)
+  (ido-mode 1)
+
+  (use-package ido-vertical-mode
+	:ensure t
+	:init
+	(ido-vertical-mode 1))
+  ; This enables arrow keys to select while in ido mode. If you want to
+  ; instead use the default Emacs keybindings, change it to
+  ; "'C-n-and-C-p-only"
+  (setq ido-vertical-define-keys 'C-n-C-p-up-and-down)
+#+END_SRC
+* Programming section
+** Company
+*** Description
+Company is the autocompletion frontend that takes all the backends
+and gives you possible autocompletions when writing programs
+*** Code
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+	:ensure t
+	:defer t
+	:config
+	(setq company-idle-delay 0)
+	(setq company-minimum-prefix-length 3)
+	(define-key company-active-map (kbd "M-n") nil)
+	(define-key company-active-map (kbd "M-p") nil)
+	(define-key company-active-map (kbd "C-n") #'company-select-next)
+	(define-key company-active-map (kbd "C-p") #'company-select-previous)
+	(define-key company-active-map (kbd "SPC") #'company-abort)
+	:hook
+	((python-mode c-mode c++-mode) . company-mode))
+#+END_SRC
+** Initialize yasnippet
+*** Description
+Yasnippet provides useful snippets, nothing to do with Company but
+still useful when used in conjuction with it
+*** Code
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet
+	:ensure t
+	:config
+	  (use-package yasnippet-snippets
+		:ensure t)
+	:hook
+	((python-mode c-mode c++-mode) . 'yas-minor-mode))
+  (yas-reload-all)
+#+END_SRC
+** C & C++
+*** Description
+Irony is the company backend for C and C++
+*** Code
+#+BEGIN_SRC emacs-lisp
+  (use-package company-c-headers
+	:ensure t)
+
+  (use-package company-irony
+	:ensure t
+	:config
+	(setq company-backends '((company-c-headers
+							  company-dabbrev-code
+							  company-irony))))
+  (use-package irony
+	:ensure t
+	:config
+	:hook
+	(('c++-mode-hook 'c-mode-hook) . 'irony-mode)
+	('irony-mode-hook) . 'irony-cdb-autosetup-compile-options)
+#+END_SRC
+** Python
+*** Description
+Company-jedi is the company backend for Python
+
+01/05/2019: For some reason, jedi doesn't work as I expect it to. I'd
+appreciate any help regarding this issue
+*** Code
+#+BEGIN_SRC emacs-lisp
+  (use-package company-jedi
+	:preface
+	(defun python-mode-company-init ()
+	(setq-local company-backends '((company-jedi
+									company-etags
+									company-dabbrev-code))))
+	:ensure t
+	:config
+	(require 'company)
+	(add-to-list 'company-backends 'company-jedi)
+	:hook
+	(('python-mode-hook) . 'python-mode-company-init))
+#+END_SRC
+* Oriyo's custom mod
+** Flycheck
+*** Description 
+*** Code
+#+BEGIN_SRC emacs-lisp
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode))
+#+END_SRC
+** Autocomplete 
+*** Description
+Autocompletes
+*** Code
+#+BEGIN_SRC emacs-lisp
+(require 'auto-complete)
+(ac-config-default)
+(global-auto-complete-mode 1)
+#+END_SRC
