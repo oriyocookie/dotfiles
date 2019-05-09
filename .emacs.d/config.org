@@ -439,7 +439,7 @@ appreciate any help regarding this issue
 	:hook
 	(('python-mode-hook) . 'python-mode-company-init))
 #+END_SRC
-* Oriyo's custom mod
+* Oriyo's changes
 ** Flycheck
 *** Description 
 *** Code
