@@ -2,6 +2,7 @@
 Witchmacs is a very simple and basic configuration file for Emacs. From here you can edit, remove,
 or add many aspects of Emacs you want. I encourage you to do so, because Emacs works best when it's
 customized to your own liking!
+https://github.com/snackon/Witchmacs Use that link for the original
 * QoL section
 ** Enable line numbers
 #+BEGIN_SRC emacs-lisp
