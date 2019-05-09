@@ -1,2 +1,2 @@
 # dotfiles
-my config files
+my config files. Dont use spacemacs anymore
