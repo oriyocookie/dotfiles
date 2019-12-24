@@ -22,13 +22,20 @@ LS_COLORS=$LS_COLORS:'di=0;93:ex=1;31' ; export LS_COLORS
 
 #export PS1='\e[1;37;42;234m\u\e[38;240m@\e[1;38;28;104;234m\h \e[38;54m\d \@\e[0m\n: \e[1m\$\e[0m '
 
-function _update_ps1() {
-    PS1=$(powerline-shell $?)
-}
+#function _update_ps1() {
+#    PS1=$(powerline-shell $?)
+#}
+#
+#
+#if [[ $TERM != linux && ! $PROMPT_COMMAND =~ _update_ps1 ]]; then
+#    PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
+#fi
 
-
-if [[ $TERM != linux && ! $PROMPT_COMMAND =~ _update_ps1 ]]; then
-    PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
+if [ -f `which powerline-daemon` ]; then
+  powerline-daemon -q
+  POWERLINE_BASH_CONTINUATION=1
+  POWERLINE_BASH_SELECT=1
+  . /usr/share/powerline/bindings/bash/powerline.sh
 fi
 
 neofetch
@@ -40,3 +47,5 @@ alias la="ls -a"
 alias t="tmux"
 alias tk="tmux kill-server"
 alias q="exit"
+alias em="emacs -nw"
+alias webserver="python -m http.server"
