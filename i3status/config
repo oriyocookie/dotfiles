@@ -11,8 +11,8 @@
 general {
     interval = 5
 	colors = true
-#	color_good = '#88b090'
-	color_good = '#21e014'
+	color_good = '#88b090'
+	#color_good = '#21e014'
 	color_degraded = '#ccdc90'
 	color_bad = '#e89393'
 	markup="pango"
@@ -26,7 +26,7 @@ order += "disk /"
 #order += "ipv6"
 #order += "run_watch VPN"
 #order += "ethernet enp5s0"
-order += "battery 0"
+order += "battery 1"
 order += "cpu_temperature 0"
 order += "cpu_usage"
 order += "load"
@@ -34,9 +34,9 @@ order += "wireless wlp3s0"
 order += "tztime local"
 
 wireless wlp3s0 {
-format_up = "%essid %ip"
+    format_up = "%essid %ip"
 
-   # format_up = " %essid %ip"
+# format_up = " %essid %ip"
 	format_down = " NO WIFI"
 	on_click 1= "exec nm-connection-editor"
 
@@ -48,18 +48,20 @@ format_up = "%essid %ip"
 #    format_down = ""
 #}
 
-battery 0 {
+battery 1 {
     format = "%status %percentage %remaining"
-	format_down = ""
+	#format_down = ""
 	last_full_capacity = true
 	integer_battery_capacity = true
 	low_threshold = 11
 	threshold_type = percentage
 	hide_seconds = true
 	status_chr = "<span color='#ffffff'></span>"
-	status_bat = "<span color='#ffffff'></span>"
-	status_unk = "<span color='#ffffff'></span>"
-	status_full = "<span color='#ffffff'></span>"
+	status_bat = "<span color='#ffffff'>🔋</span>"
+	status_unk = "<span color='#ffffff'>UNK</span>"
+	status_full = "<span color='#ffffff'>🔋</span>"
+	#path = "/sys/class/power_supply/BAT1/uevent"
+
 }
 
 run_watch DHCP {
@@ -78,9 +80,9 @@ tztime local {
 }
 
 load {
-format = "<span color='#ffffff'></span> %1min"
+    format = "<span color='#ffffff'></span> %1min"
 
-   # format = "📊 %1min"
+# format = "📊 %1min"
 
 }
 
@@ -90,14 +92,14 @@ cpu_usage {
 }
 
 cpu_temperature 0 {
- format = "<span color='#ffffff'></span> %degrees°C"
+    format = "<span color='#ffffff'>🌡️</span> %degrees°C"
 #    format = "🌡️ %degrees°C"
 }
 
 disk "/" {
-format = "<span color='#ffffff'></span> <span color='#0cf2fd'>%avail</span>"
+    format = "<span color='#ffffff'></span> <span color='#ffffff'>%avail</span>"
 
-    #format = "📀%avail"
+#format = "📀%avail"
 	prefix_type	= custom
 	low_threshold = 20
 	threshold_type = percentage_avail
@@ -120,10 +122,10 @@ format = "<span color='#ffffff'></span> <span color='#0cf2fd'>%avail</span>"
 #}
 
 volume master {
-format = "%volume <span color='#ffffff'></span> "
+    format = "%volume <span color='#ffffff'></span> "
 
 #    format = "🔊 %volume"
-format_muted = "<span color='#ffffff'></span>"
+	format_muted = "<span color='#ffffff'></span>"
 
 #	format_muted = "🔇"
 	device = "default"
