@@ -1,0 +1,16 @@
+{
+    "firefox": "firefox",
+    "Chromium": "chrome",
+    "chrome": "chrome",
+    "termite": "terminal",
+    "terminator": "terminal",
+    "thunderbird": "envelope",
+    "jetbrains-idea-ce": "edit",
+    "nemo": "folder-open",
+    "clementine": "music",
+    "vlc": "play",
+    "signal": "comment",
+    "Spotify":"spotify",
+    "Steam":"steam",
+	"evince":"file-pdf"
+}

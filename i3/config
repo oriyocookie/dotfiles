@@ -29,9 +29,9 @@ hide_edge_borders both
 floating_modifier $mod
 
 # start a terminal
-bindsym $mod+Shift+Return exec terminator 
-bindsym $mod+Return exec termite 
-bindsym $mod+F3 exec termite 
+bindsym $mod+Shift+Return exec termite 
+bindsym $mod+Return exec terminator 
+bindsym $mod+F3 exec terminator 
 
 # kill focused window
 bindsym $mod+Shift+q kill
@@ -197,9 +197,10 @@ bindsym $mod+r mode "resize"
 
 set $bg-color            #4267b260
 set $inactive-bg-color   #2f343f00
-#set $text-color          #eb42f4 
-set $text-color          #42f46e
-set $inactive-text-color #C71585	
+set $text-color          #ffffff 
+#set $text-color          #42f46e
+#set $inactive-text-color #C71585	
+set $inactive-text-color #ffffff	
 set $urgent-bg-color     #e53935
 set $indicator-color     #a0a0a0
 
@@ -217,13 +218,14 @@ client.urgent           $urgent-bg-color   $urgent-bg-color   $text-color       
 bar {
 #status_command i3status 
     i3bar_command i3bar -t
-	font pango:monospace 6
+	font pango:monospace 9
+	position top
 
 	colors {
-# background #4b367c70
-	    background #76453040
+ #background #4b367c70
+	    background #00000090
 		separator #757575
-		statusline #ff2bcd
+		statusline #ffffff
 #                  border             background         text
 		focused_workspace  #106d4b            #1a75ff80      $text-color
 		inactive_workspace $inactive-bg-color $inactive-bg-color $inactive-text-color
@@ -290,10 +292,10 @@ bindsym $mod+w workspace prev
 bindsym $mod+q workspace back_and_forth
 
 bindsym $mod+Print exec "scrot $f ~/Pictures/Screenshots/%s_%H%M_%d%m%Y_$wx$h.png"
-bindsym $mod+Shift+Print exec "scrot -s $f ~/Pictures/Screenshots/%s_%H%M_%d%m%Y_$wx$h.png"
+bindsym $mod+Shift+Print exec "scrot $f ~/Pictures/htb/%s_%H%M_%d%m%Y_$wx$h.png"
 
-bindsym XF86MonBrightnessUp exec xbacklight -inc 20
-bindsym XF86MonBrightnessDown exec xbacklight -dec 20
+bindsym XF86MonBrightnessUp exec xbacklight -inc 10
+bindsym XF86MonBrightnessDown exec xbacklight -dec 10
 
 #i3-gaps settings
 for_window [class="^.*"] border pixel 2 #disable titlebar
@@ -307,9 +309,10 @@ smart_gaps on
 #
 #
 bindsym $mod+m bar mode toggle
-exec --no-startup-id conky -c ~/.config/conky.conf #conky
+#exec --no-startup-id conky -c ~/.config/conky.conf #conky
+exec --no-startup-id conky -c ~/.config/conky/conky_stats #conky
 #exec --no-startup-id synclient TouchpadOff=1 #disable touchpad
-exec xinput set-prop "SynPS/2 Synaptics TouchPad" "Device Enabled" 0
+#exec xinput set-prop "SynPS/2 Synaptics TouchPad" "Device Enabled" 0
 #exec --no-startup-id redshift -c ~/.redshiftconfig
 exec --no-startup-id setxkbmap -option "caps:escape" #turn caps lock to escape
 exec --no-startup-id gsettings set org.blueman.plugins.powermanager auto-power-on false
@@ -323,10 +326,17 @@ exec --no-startup-id xss-lock -- ~/.config/i3/scripts/lock.sh #-- i3lock
 #exec_always --no-startup-id exec /usr/bin/i3wsr
 exec_always --no-startup-id exec i3-workspace-names-daemon
 
-bindsym $mod+Shift+b border normal
-
-bindsym $mod++b border pixel 2
-
+#bindsym $mod+Shift+b border normal
+#
+#bindsym $mod+b border pixel 4
+exec --no-startup-id alttab -fg "#d58681" -bg "#4a4a4a" -frame "#eb564d" -t 128x150 -i 127x64
 
 exec --no-startup-id /usr/lib/geoclue-2.0/demos/agent
 
+exec --no-startup-id synclient tapbutton1=1 
+exec --no-startup-id synclient PalmDetect=1 
+exec --no-startup-id synclient TapButton2=3 
+exec --no-startup-id synclient TapButton3=2 
+#exec libinput-gestures-setup autostart
+#exec libinput-gestures-setup start
+#exec ~/.config/i3/scripts/renameworkspaces.py
